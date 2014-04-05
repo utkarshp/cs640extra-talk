@@ -1,0 +1,5 @@
+\frametitle{Size of max-term}
+Due to theorem \ref{size}, we can say something about the max-term of a function which \emph{cannot} be expressed as an $s-$CNF
+\\~\\
+
+If a function $f$ cannot be expressed as an $s-$CNF, then there must be at least one max-term of $f$ of size $s+1$

@@ -1,0 +1,270 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer Presentation
+% LaTeX Template
+% Version 1.0 (10/11/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+\documentclass{beamer}
+
+\mode<presentation> {
+
+% The Beamer class comes with a number of default slide themes
+% which change the colors and layouts of slides. Below this is a list
+% of all the themes, uncomment each in turn to see what they look like.
+
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+% As well as themes, the Beamer class has a number of color themes
+% for any slide theme. Uncomment each of these in turn to see how it
+% changes the colors of your current slide theme.
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+%\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+
+%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title[Proving the Switching Lemma]{Parity $\in AC^0$ using Hastad's Switching Lemma} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{Utkarsh Patange} % Your name
+\institute[IIT-K] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{
+Indian Institute of Technology Kanpur \\ % Your institution for the title page
+\medskip
+\textit{john@smith.com} % Your email address
+}
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+
+\begin{frame}
+\frametitle{Overview} % Table of contents slide, comment this block out to remove it
+\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+%------------------------------------------------
+\section{First Section} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
+
+\begin{frame}
+\frametitle{Motivation for a weaker class}
+\begin{itemize}
+\item To prove $P\neq NP,$ knowing $P \subseteq NP$, we must find a language $L\in NP$ and $L \not\in P$. That is a lower bound on the resources required to decide a language must be obtained.
+\item Since our conventional models of computation are very powerful, it becomes difficult to comment on the lower bounds. An indirect line of attack, to quote Johan Hastad \cite{thesis} would be: 
+\\~\\
+\emph{"We want to prove that the computer cannot do something quickly.
+We cannot do this. But if we tie the hands and feet of the computer
+together maybe we will have better luck. The hope being of course that
+we eventually will be able to remove the ropes and prove that the full
+powered computer needs a long time"}
+
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Boolean Circuits}
+\begin{itemize}
+\item We define a boolean circuit as a Directed Acyclic Graph where internal nodes are labeled with one of $\vee,\wedge$ and $ \neg$ representing that the "output of the node" is OR, AND or NEGATION of it's input(s)
+\item An edge $(u,v)$ in the DAG represents that the output of node $u$ is given as an input to node $v$
+\pause\item Leaf nodes (nodes with in-degree = 0) are bits of the input string.
+\item Output of the circuit is defined to be the output of the root node (node with out-degree = 0). There is only one root node in any circuit
+\item We define some terms here:
+\pause\begin{itemize}
+\item Depth of a circuit:= Longest path from root to any leaf node.
+\item Fan in of a node:= The in-degree of the node
+\end{itemize}
+\item Note that fan in of a node labeled $\neg$ can only be 1. Also, we have not restricted fan-in's of any other node, neither have we restricted the depth of the circuit
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Boolean Circuits}
+\begin{itemize}
+	\item We define a \emph{T(n)-size circuit family } to be a sequence $\{C_n\}_{n\in \mathbb{N}}$ of Boolean circuits, where $C_n$ has $n$ inputs, single output and $|C_n|\leq T(n) \, \forall n\in \mathbb{N}$ \cite{textbook}
+	\item A language $L$ is said to be $recognized$ by a circuit family $\{C_n\}_{n\in \mathbb{N}}$ if $\forall x\in \{0,1\}^n,\, x\in L \iff C_n(x)=1 $ \cite{textbook}
+	\pause\item With these definitions, if we allow a circuit of polynomial size and unbounded depth, we get a class $P_{/Poly}$ which is found to be ``recognizing'' languages that are undecidable.
+	\item Due to this, we try to restrict the class of boolean circuits even further.
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{The class $AC$}
+\begin{itemize}
+ \item For every $d,\, L\in NC^d $ if $L$ can be decided by a family of circuits $\{C_n\}$ where $C_n$ has
+ \begin{itemize}
+  \item size polynomial in $n$
+  \item depth $O(\log^d n) $
+  \item unbounded fan-in. i.e., any node (except input nodes, of course) can have arbitrarily many inputs.
+ \end{itemize}
+ \item $AC = \cup_{i\geq 0}AC^i $
+ \item We can also define another class $NC$ which is same as $AC$ except that the circuits are allowed a fan-in of two only.
+ \pause\item Since unbounded fan-in can be simulated using a tree of ORs/ANDs of depth $O(\log n)$, $NC^i\subseteq AC^i \subseteq NC^{i+1} $. For $i=0$, the inclusion is known to be strict since $NC^0$ is very limited while due to unbounded fan-in, $AC_0$ is not.
+ \item We get this result by studying the parity function
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+\section{Second Section}
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Table}
+\begin{table}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+\midrule
+Treatment 1 & 0.0003262 & 0.562 \\
+Treatment 2 & 0.0015681 & 0.910 \\
+Treatment 3 & 0.0009271 & 0.296 \\
+\bottomrule
+\end{tabular}
+\caption{Table caption}
+\end{table}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Theorem}
+\begin{theorem}[Mass--energy equivalence]
+$E = mc^2$
+\end{theorem}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
+\frametitle{Verbatim}
+\begin{example}[Theorem Slide Code]
+\begin{verbatim}
+\begin{frame}
+\frametitle{Theorem}
+\begin{theorem}[Mass--energy equivalence]
+$E = mc^2$
+\end{theorem}
+\end{frame}\end{verbatim}
+\end{example}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Figure}
+Uncomment the code on this slide to include your own image from the same directory as the template .TeX file.
+%\begin{figure}
+%\includegraphics[width=0.8\linewidth]{test}
+%\end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
+\frametitle{Citation}
+An example of the \verb|\cite| command to cite within the presentation:\\~
+
+This statement requires citation %\cite{p1}.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{References}
+\footnotesize{
+\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
+\bibitem[H]{thesis} Hastad, Johan (1987)
+\newblock Computational limitations of small depth circuits
+\newblock \emph{Ph.D. thesis, Massachusetts Institute of Technology.}
+\bibitem[AB]{textbook} Arora Barak (2009)
+\newblock Computational Complexity: A Modern Approach
+\newblock \emph{Published on April 2009 by Cambridge University Press}
+\end{thebibliography}
+}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\Huge{\centerline{The End}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

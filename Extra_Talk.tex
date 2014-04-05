@@ -1,0 +1,442 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer Presentation
+% LaTeX Template
+% Version 1.0 (10/11/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+\documentclass{beamer}[11pt]
+\usepackage[pgf]{dot2texi}
+\usepackage{amsmath}
+\usepackage{lipsum}
+
+\newcommand\Fontvi{\fontsize{10}{7.2}\selectfont}
+%\setbeamertemplate{theorems}[numbered]
+\mode<presentation> {
+
+% The Beamer class comes with a number of default slide themes
+% which change the colors and layouts of slides. Below this is a list
+% of all the themes, uncomment each in turn to see what they look like.
+
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+%\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+% As well as themes, the Beamer class has a number of color themes
+% for any slide theme. Uncomment each of these in turn to see how it
+% changes the colors of your current slide theme.
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+%\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+
+%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title[Proving the Switching Lemma]{Parity $\not\in AC^0$ using Hastad's Switching Lemma} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{Utkarsh Patange} % Your name
+\institute[IIT-K] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{
+Indian Institute of Technology Kanpur \\ % Your institution for the title page
+\medskip
+%\textit{john@smith.com} % Your email address
+}
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+%------------------------------------------------
+\section{Introduction} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
+
+\begin{frame}
+\frametitle{Motivation for a weaker class}
+\begin{itemize}
+\item To prove $P\neq NP,$ knowing $P \subseteq NP$, we must find a language $L\in NP$ and $L \not\in P$. That is a lower bound on the resources required to decide a language must be obtained.
+\item Since our conventional models of computation are very powerful, it becomes difficult to comment on the lower bounds. An indirect line of attack, to quote Johan Hastad \cite{thesis} would be: 
+\\~\\
+\emph{``We want to prove that the computer cannot do something quickly.
+We cannot do this. But if we tie the hands and feet of the computer
+together maybe we will have better luck. The hope being of course that
+we eventually will be able to remove the ropes and prove that the full
+powered computer needs a long time"}
+
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Boolean Circuits}
+\begin{itemize}
+\item We define a boolean circuit as a Directed Acyclic Graph where internal nodes are labeled with one of $\vee,\wedge$ and $ \neg$ representing that the "output of the node" is OR, AND or NEGATION of it's input(s)
+\item An edge $(u,v)$ in the DAG represents that the output of node $u$ is given as an input to node $v$
+\pause\item Leaf nodes (nodes with in-degree = 0) are bits of the input string.
+\item Output of the circuit is defined to be the output of the root node (node with out-degree = 0). There is only one root node in any circuit
+\item We define some terms here:
+\pause\begin{itemize}
+\item Depth of a circuit:= Longest path from root to any leaf node.
+\item Fan in of a node:= The in-degree of the node
+\end{itemize}
+\item Note that fan in of a node labeled $\neg$ can only be 1. Also, we have not restricted fan-in's of any other node, neither have we restricted the depth of the circuit
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Boolean Circuits}
+\begin{itemize}
+	\item We define a \emph{T(n)-size circuit family } to be a sequence $\{C_n\}_{n\in \mathbb{N}}$ of Boolean circuits, where $C_n$ has $n$ inputs, single output and $|C_n|\leq T(n) \, \forall n\in \mathbb{N}$ \cite{textbook}
+	\item A language $L$ is said to be $recognized$ by a circuit family $\{C_n\}_{n\in \mathbb{N}}$ if $\forall x\in \{0,1\}^n,\, x\in L \iff C_n(x)=1 $ \cite{textbook}
+	\pause\item With these definitions, if we allow a circuit of polynomial size and unbounded depth, we get a class $P_{/Poly}$ which is found to be ``recognizing'' languages that are undecidable.
+	\item Due to this, we try to restrict the class of boolean circuits even further to get $AC$ and $NC$.
+\end{itemize}
+
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{The class $AC$}
+\begin{itemize}
+ \item For every $d,\, L\in AC^d $ if $L$ can be decided by a family of circuits $\{C_n\}$ where $C_n$ has
+ \begin{itemize}
+  \item size polynomial in $n$
+  \item depth $O(\log^d n) $
+  \item unbounded fan-in. i.e., any node (except input nodes, of course) can have arbitrarily many inputs.
+ \end{itemize}
+ \item $AC = \cup_{i\geq 0}AC^i $
+ \item We can also define another class $NC$ which is same as $AC$ except that the circuits are allowed a fan-in of two only.
+ \pause\item Since unbounded fan-in can be simulated using a tree of ORs/ANDs of depth $O(\log n)$, $NC^i\subseteq AC^i \subseteq NC^{i+1} $. For $i=0$, the inclusion is known to be strict. Clearly, $NC^0$ is very limited, while due to unbounded fan-in, $AC^0$ is not.
+ \item We get $AC^0 \neq NC^1$ by studying the parity function $\oplus$. We will prove that this function is not in $AC^0$
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Proof Sketch}
+
+\begin{itemize}
+ \item We will first prove Hastad's Switching Lemma and using that prove $\oplus \not\in AC^0$
+ \item The original proof given by Johan Hastad \cite{thesis} is rather complicated. We present here an alternate proof by Razborov \cite{alternate}.
+ \item Before we state the lemma, we need to define a few terms:
+ \pause
+ \begin{itemize}
+  \item $k-$CNF:= A boolean formula that is in conjunctive normal form and every clause of which has at most $k$ literals. Similarly, we define $k-$DNF.
+  \item Restriction on a function:= Assigning some value to some of the input variables to the function
+  \item $f|_\rho$:= A function $f$ under restriction $\rho$. That is, $f|_\rho$ takes an assignment $\tau$ to variables not assigned any value by $\rho$ and outputs $f$ applied to $\rho$ and $\tau$.
+  \item $f|_{\pi\rho} := f|_\pi|_\rho $ for restrictions $\pi$ and $\rho$ that are on disjoint sets of variables
+ \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Switching Lemma: Statement}
+
+If $f$ is a function that is expressible as a $k-$DNF and $\rho$ is a random restriction that assigns random values to $t$ randomly selected input bits, then $\forall s\geq 2$
+\begin{equation}
+ \Pr\limits_{\rho}[f|_{\rho} \text{ is not expressible as \emph{s-CNF}} ] \leq \left(\frac{(n-t)k^{10} }{n}\right)^{s/2}
+\end{equation}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Terms Used}
+\begin{itemize}
+ \item min-term of $f$:= A partial assignment to $f$'s variables that makes $f$ output \textbf{1} regardless of what value is assigned to the rest of the variables
+ \item max-term of $f$:= A partial assignment to $f'$s variables that makes $f$ output \textbf{0} regardless of what value is assigned to the rest of the variables
+ 
+ For example, Consider a function that is expressible as a $k-$DNF. Every clause in this formula can yield a size-$k$ min-term of $f$. Similarly in a function that is expressible as a $k-$CNF, every clause can yield a size-$k$ max-term.
+ \pause\item We will assume henceforth that the min-terms (respectively max-terms) are minimal. That is, no assignment to a proper subset of the term's variables would make the function 1(respectively 0).
+ 
+ 
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Size of max-term}
+\begin{theorem}
+\label{size}
+ If all max-terms of a function are of size at most s, then the function is expressible as an $s-$CNF.
+
+\end{theorem}
+\begin{itemize}
+ \item It is a known result from boolean algebra (circuit minimization) that if two functions have same set of max-terms then they are equivalent. This can be proved by representing the functions as product of sums for which there is a unique representation
+ \item In the function $f$, we consider each of its max-terms $\sigma_i$ one-by-one and construct a clause $C_i$ corresponding to it
+ \pause\item For any variable $x$ that is assigned 1 in $\sigma_i$, we include $\overline{x}$ in $C_i$ and for $y=0$ in $\sigma_i$, we include $y$ in $C_i$.
+ \item Taking OR of all of the literals in $C_i$, we get a clause.
+ \item Doing this for every max-term gives us a set of clauses each having at most $s$ literals. Thus, the theorem stands proved.
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Size of max-term}
+\begin{theorem}
+\label{size}
+ If all max-terms of a function are of size at most s, then the function is expressible as an $s-$CNF.
+
+\end{theorem}
+Due to the above theorem we can say something about the size of the max-term of a function which \emph{cannot} be expressed as an $s-$CNF
+\\~\\
+
+If a function $f$ cannot be expressed as an $s-$CNF, then there must be at least one max-term of $f$ of size $\geq s+1$
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Finding the probability}
+\begin{itemize}
+ \item Let $R_t$ be the set of all restrictions of $t\geq n/2$ variables. We have $|R_t| = \binom{n}{t}2^t $
+ \item Let $B$ be the set of \emph{bad restrictions} \--- those $\rho \in R_t$ for which $f|_\rho$ is not expressible as an $s-$CNF
+ \item To prove the switching lemma, we must prove a specific bound on probability of a random restriction being bad = $\frac{|B|}{|R_t|}$
+ \item To compute $|B|$, we establish a one-to-one mapping $G:B \rightarrow R_{t+s}\times \{0,1\}^\ell $ for some $\ell= O(s\log k) $
+ \item This will give us $|B| = \binom{n}{t+s}2^{t+s+\ell} = \binom{n}{t+s}2^t2^sk^{O(s)} $
+\end{itemize}
+\pause If such $G$ exists, we get
+\begin{equation}
+ \frac{|B|}{|R_t|} = \frac{\binom{n}{t+s}2^t2^sk^{O(s)}}{\binom{n}{t}2^t } = \frac{\binom{n}{t+s}2^sk^{O(s)} }{\binom{n}{t} }
+\end{equation}
+To prove the lemma, it suffices to prove $\binom{n}{t+s} \leq \binom{n}{t}\left(\frac{e(n-t) }{n }\right)^s $ since this will imply a bound that is stronger than the lemma
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+ \frametitle{Proving $\binom{n}{t+s} \leq \binom{n}{t}\left(\frac{e(n-t) }{n }\right)^s $}
+ It suffices if we prove,
+\[
+ \frac{t!(n-t)!}{(t+s)!(n-t-s)! } \leq e^s\cdot \frac{(n-t)^s}{n^s}  
+\]
+Consider
+\[
+ \underbrace{\left(\frac{n-t}{n-t}\cdot\frac{n-t-1}{n-t}\cdot\ldots\cdot \frac{n-t-s+1}{n-t} \right)}_{\leq 1}\cdot\underbrace{\left(\underbrace{\frac{n}{t+s}}_{\leq 2}\cdot\underbrace{\frac{n}{t+s-1}}_{\leq 2}\cdot\ldots\cdot\underbrace{\frac{n}{t+1}}_{\leq 2} \right)}_{\leq 2^s \leq e^s \text{ Since }t\geq n/2 }
+\]
+Hence proved
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+\frametitle{Proving upper bound on probability}
+\Fontvi
+ Thus we get,
+ \[
+ \frac{|B|}{|R_t|} = \frac{\binom{n}{t+s}2^sk^{O(s)} }{\binom{n}{t} } \leq \left(\frac{2e(n-t) }{n }\right)^sk^{O(s) }
+ \]
+ \[
+ \Pr\limits_{\rho}[f|_{\rho} \text{ is not expressible as \emph{s-CNF}} ]\leq \left(\frac{2e(n-t) }{n }\right)^{s }k^{O(s)} \leq \left(\frac{(n-t)k^{10} }{n}\right)^{s/2}
+ \]
+ Which is the statement of the switching lemma
+ 
+ We will see later that the term $O(s) $ is actually $\approx 2s $. Thus, we are relaxing the upper bound in the sense that power of a term less than 1 is being decreased and that of a term greater than 1 is increased
+ \pause
+ Also, we are assuming here that $k\geq 2 > (2e)^{\frac{1}{3} } $ since for $k=1$, we can always build an $s-$CNF $\forall s\geq 2$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Constructing the Mapping}
+\begin{itemize}
+ \item Thus to prove the switching lemma, it is sufficient to describe the one-to-one mapping $G:B \rightarrow R_{t+s}\times \{0,1\}^\ell$.
+ \item Note that a bad restriction $\rho$ cannot make any clause of $f$ true, since that will give $f|_\rho=1$. Similarly, not all clauses are made false by $\rho$
+ \item Since $f|_\rho$ is not expressible as an $s-$CNF, it has some max term $\pi$ of size greater than $s$.
+ \item Assuming $\pi$ to be maximal, we can say that $f|_{\rho\pi} = 0$ but $\forall \pi' \subset \pi\, f|_{\rho\pi'}\neq 0 $
+ \item We will define the mapping $G(\rho) =(\rho\sigma,c) $ where $\sigma$ is a suitably defined restriction on \emph{exactly s} of $\pi$'s variables and $c\in\{0,1\}^\ell $
+ \item Thus, $\rho\sigma$ restricts at least $t+s$ variables and the proof follows
+\end{itemize}
+
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Constructing the Mapping}
+\begin{itemize}
+ \item Let the clauses be ordered in an arbitrary fashion: $t_1,t_2,\ldots,t_i,\ldots,t_n$. Within the clauses, the variables are also ordered in an arbitrary way.
+ \item By definition, $\rho\pi$ is a restriction that sets all the clauses to zero
+ \item We split $\pi$ into $m\leq s$ sub-restrictions $\pi_1,\pi_2,\ldots, \pi_m$ inductively as follows:
+ \begin{itemize}
+  \item Assume we already have $\pi_1,\pi_2,\ldots, \pi_{i-1}$ such that $\pi_1\pi_2\ldots \pi_{i-1} \neq \pi$
+  \item Let $t_{l_i}$ be the first clause in our ordering of terms that is not 0 under $\rho\pi_1\pi_2\ldots \pi_{i-1}$
+  \pause\item Let $Y_i$ be the set of all variables set by $\pi $ but not by $\rho\pi_1\pi_2\ldots \pi_{i-1}$. Since $t_{l_i}$ is 0 under $\pi$, $Y_i\neq \phi $
+  \item We define $\pi_i$ to be the restriction that is induced by $\pi$ on the variables of $Y_i$ (and hence sets $t_{l_i} $ to 0)
+  \item We define $\sigma_i$ to be the restriction of $Y_i$ that \emph{keeps $t_{l_i}$ from} being 0. Such a restriction must exist since otherwise, $t_{l_i}$ would be 0 under $\rho\pi_1\pi_2\ldots \pi_{i-1}$ itself
+ \end{itemize}
+ \item Note that $\sigma_i$ \emph{does not} ensure $t_{l_i} = 1$ since the clause is an $\wedge$ of literals
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Constructing the Mapping}
+ \begin{itemize}
+  \item This process is continued until at least $s$ variables are assigned due to the restriction $\pi_1\pi_2\ldots\pi_m$
+  \item We \emph{trim} $\pi_m$ in an arbitrary way so as to make these restrictions assign exactly $s$ variables
+  \item Note that $\pi$ assigned more than $s$ variables. So, $\pi_1\pi_2\ldots\pi_m \neq \pi$
+  \pause\item Also note that $\forall i<j,\, \pi_j$ does not assign values to variables that are already assigned by $\pi_i$
+  \item We define $G(\rho)=(\rho\sigma_1\sigma_2\ldots\sigma_m,c) $. To prove that this is one-to-one mapping, we must prove that we can invert it uniquely
+  \item Since there is no way to identify $\rho$ from $\sigma_1,\sigma_2,\ldots,\sigma_m$ we keep some additional information in $c$ to help us
+  
+ \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Uniquely inverting the mapping}
+ \begin{itemize}
+  \item Given the assignment $\rho\sigma_1\sigma_2\ldots\sigma_m$, we plug this into $f$ and try to infer $t_{l_1}$ from it
+  \item $t_{l_1} $ is the first clause that is not fixed to 0 by $\rho$. This property is maintained by $\sigma_1$.
+  \item Also, $\sigma_2\ldots\sigma_m$ does not assign values to any variables in $t_{l_1}$.\pause This is because all variables of $t_{l1} $ restricted by  $\pi$ were already there in $\pi_1$ and therefore cannot be in later $\pi_i$`s and hence $\sigma_i$'s
+  \pause\item In string $c$, we include 
+  \begin{itemize}
+   \item $s_1:=$ number of variables in $\pi_1$
+   \item The indices in $t_{l_1}$ of the variables in $\pi_1$
+   \item And the values that $\pi_1$ assigns to these variables
+   \item We will need $O(s_1\log k) $ bits to store this information since each term has at most $k$ variables
+  \end{itemize}
+ \item Once we know $t_{l_1} $, using the information in $c$, it is easy to reconstruct $\pi_1$
+ \end{itemize}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+ \frametitle{Uniquely inverting the mapping}
+ \begin{itemize}
+  \item Knowing $\pi_1$, we can change the restriction to $\rho\pi_1\sigma_2\ldots\sigma_m$
+  \begin{itemize}
+   \pause\item Since we know the variables to which $\pi_1$ assigns values, we only need to change them to the exact assignment that $\pi_1$ assigns
+   \item This information is there in $c$
+  \end{itemize}
+ \pause\item Now, we can similarly work out which clause is $t_{l_2}$. It is again the first non-zero clause under the new restriction
+ \item Here, we will need to use the next $O(s_2\log k) $ bits of $c$ to reconstruct $\pi_2$
+ \item We continue this process until we have processed all $m$ clauses and figured out $\pi_1,\pi_2,\ldots,\pi_m$. We can then simply remove the assignments by $\pi_i$`s to get $\rho$
+ \item We get, $|c|=O((s_1+s+2+\ldots +s_m)\log k) = O(s\log k) $
+ \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+ \frametitle{Summary}
+ \begin{itemize}
+  \item We first proved a theorem stating that if a function cannot be expressed as an $s-$CNF, then it must have at least one max-term of size  $>s$
+  \item We called a restriction $\rho$ a bad restriction if $f|_\rho$ cannot be expressed as an $s-$CNF
+  \item For a function $f|_\rho$ that cannot be expressed as an $s-$CNF, we assumed one such max-term $\pi$
+  \item Using $\pi$ we constructed $\sigma$ and defined $G(\rho)=(\rho\sigma,c) $ where $c$ contained information about $\pi$ that helped us reconstruct $\rho$ when we are given $\rho\sigma$. This proved $G$ to be a one-to-one mapping
+  \item Since the one-to-one mapping was from a set of bad restrictions to another set that could be easily counted, we got an idea of the cardinality of the set of bad restrictions
+  \item Using this cardinality, we were able to bound the probability of choosing a bad restriction among all possible restrictions of a particular size
+ \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{References}
+\footnotesize{
+\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
+\bibitem[H]{thesis} Hastad, Johan (1987)
+\newblock Computational limitations of small depth circuits
+\newblock \emph{Ph.D. thesis, Massachusetts Institute of Technology.}
+\bibitem[AB]{textbook} Arora Barak (2009)
+\newblock Computational Complexity: A Modern Approach
+\newblock \emph{Published on April 2009 by Cambridge University Press}
+\bibitem[RA]{alternate}Razborov, Alexander A. (1993)
+\newblock An equivalence between second order bounded domain bounded arithmetic and first order bounded arithmetic
+\newblock \emph{Arithmetic, proof theory and computational complexity 23: 247–277}
+\end{thebibliography}
+}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\Huge{\centerline{The End}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
